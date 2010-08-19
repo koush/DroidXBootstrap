@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, Bootstrap!</string>
-    <string name="app_name">DroidXBootstrap</string>
+    <string name="app_name">Droid X Bootstrapper</string>
+    <string name="flash">Bootstrap Recovery</string>
+    <string name="reboot_recovery">Reboot Recovery</string>
 </resources>

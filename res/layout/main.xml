@@ -3,10 +3,8 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@drawable/logo"
     >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
+<Button android:text="@string/flash" android:id="@+id/flash" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:textSize="20sp"></Button>
+<Button android:text="@string/reboot_recovery" android:id="@+id/reboot" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:textSize="20sp"></Button>
 </LinearLayout>
