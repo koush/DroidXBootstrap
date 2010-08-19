@@ -49,6 +49,8 @@ public class Bootstrap extends Activity {
                 command.append(busybox + " mkdir -p /preinstall/recovery ; ");
                 command.append(busybox + " cp " + updatebinary + " /preinstall/recovery/update-binary ; ");
                 command.append(busybox + " cp " + recoveryzip + " /preinstall/recovery/recovery.zip ; ");
+                command.append(busybox + " cp " + hijack + " /preinstall/recovery/hijack ; ");
+                command.append(busybox + " cp " + logwrapper + " /preinstall/recovery/logwrapper ; ");
 
                 // restart adbd as root
                 command.append(busybox + " mount -orw,remount / ; ");
