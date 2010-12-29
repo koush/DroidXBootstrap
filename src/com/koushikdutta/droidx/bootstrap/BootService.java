@@ -4,8 +4,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
 public class BootService extends Service {
+	
+	private static final String TAG = "DXB/BootService";
 
     @Override
     public void onStart(Intent intent, int startId) {
@@ -22,14 +25,23 @@ public class BootService extends Service {
                 String adbd = filesDir + "/adbd";
                 
                 StringBuilder command = new StringBuilder();
+                
                 // prevent recovery from booting here
+                Log.d(TAG, "Removing recovery_mode trigger");
                 command.append("rm /data/.recovery_mode ; ");
-                // restart adbd as root
-                command.append(busybox + " mount -orw,remount / ; ");
-                command.append("mv /sbin/adbd /sbin/adbd.old ; ");
-                command.append(busybox + " cp " +  adbd + " /sbin/adbd ; ");
-                command.append(busybox + " mount -oro,remount / ; ");
-                command.append(busybox + " kill $(ps | " + busybox + " grep adbd) ;");
+                
+                ROMBootstrapSettings settings = new ROMBootstrapSettings();
+                
+                if(settings.restartAdb()) {
+                    // restart adbd as root
+                	Log.d(TAG, "Restarting ADB as Root");
+                	command.append(busybox + " mount -orw,remount / ; ");
+                	command.append("mv /sbin/adbd /sbin/adbd.old ; ");
+                	command.append(busybox + " cp " +  adbd + " /sbin/adbd ; ");
+                	command.append(busybox + " mount -oro,remount / ; ");
+                	command.append(busybox + " kill $(ps | " + busybox + " grep adbd) ;");
+                }
+                
                 try {
                     Helper.runSuCommand(BootService.this, command.toString());
                 }

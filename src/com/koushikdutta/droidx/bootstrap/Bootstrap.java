@@ -20,6 +20,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class Bootstrap extends Activity {
+
+	private static final String TAG = "DXB/Bootstrap";
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,25 +44,39 @@ public class Bootstrap extends Activity {
                 String adbd = filesDir + "/adbd";
 
                 StringBuilder command = new StringBuilder();
-                command.append(busybox + " mount -oremount,rw /system ; ");
-                command.append(busybox + " cp " + logwrapper + " /system/bin/logwrapper.bin ; ");
-                command.append(busybox + " cp " + hijack + " /system/bin/hijack ; ");
-                command.append("cd /system/bin ; rm logwrapper ; ln -s hijack logwrapper ; ");
-                command.append(busybox + " mount -oremount,ro /system ; ");
-                command.append(busybox + " mkdir -p /preinstall/recovery ; ");
-                command.append(busybox + " cp " + updatebinary + " /preinstall/recovery/update-binary ; ");
-                command.append(busybox + " cp " + recoveryzip + " /preinstall/recovery/recovery.zip ; ");
-                command.append(busybox + " cp " + hijack + " /preinstall/recovery/hijack ; ");
-                command.append(busybox + " cp " + logwrapper + " /preinstall/recovery/logwrapper ; ");
+                
+                ROMBootstrapSettings settings = new ROMBootstrapSettings();
+                
+                if(settings.installHijack()) {
+	            	Log.d(TAG, "Installing hijack");
+	                command.append(busybox + " mount -oremount,rw /system ; ");
+	                command.append(busybox + " cp " + logwrapper + " /system/bin/logwrapper.bin ; ");
+	                command.append(busybox + " cp " + hijack + " /system/bin/hijack ; ");
+	                command.append("cd /system/bin ; rm logwrapper ; ln -s hijack logwrapper ; ");
+	                command.append(busybox + " mount -oremount,ro /system ; ");
+                }
+                
+                if(settings.installRecovery()) {
+	                Log.d(TAG, "Installing recovery");
+	                command.append(busybox + " mkdir -p /preinstall/recovery ; ");
+	                command.append(busybox + " cp " + updatebinary + " /preinstall/recovery/update-binary ; ");
+	                command.append(busybox + " cp " + recoveryzip + " /preinstall/recovery/recovery.zip ; ");
+	                command.append(busybox + " cp " + hijack + " /preinstall/recovery/hijack ; ");
+	                command.append(busybox + " cp " + logwrapper + " /preinstall/recovery/logwrapper ; ");
+                }
 
-                // restart adbd as root
-                command.append(busybox + " mount -orw,remount / ; ");
-                command.append("mv /sbin/adbd /sbin/adbd.old ; ");
-                command.append(busybox + " cp " +  adbd + " /sbin/adbd ; ");
-                command.append(busybox + " mount -oro,remount / ; ");
-                command.append(busybox + " kill $(ps | " + busybox + " grep adbd) ;");
+                if(settings.restartAdb()) {
+	                // restart adbd as root
+	            	Log.d(TAG, "Restarting ADB as Root");
+	                command.append(busybox + " mount -orw,remount / ; ");
+	                command.append("mv /sbin/adbd /sbin/adbd.old ; ");
+	                command.append(busybox + " cp " +  adbd + " /sbin/adbd ; ");
+	                command.append(busybox + " mount -oro,remount / ; ");
+	                command.append(busybox + " kill $(ps | " + busybox + " grep adbd) ;");
+                }
 
                 // prevent recovery from booting here
+                Log.d(TAG, "Removing recovery_mode trigger");
                 command.append("rm /data/.recovery_mode ; ");
                 
                 AlertDialog.Builder builder = new Builder(Bootstrap.this);
